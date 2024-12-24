@@ -1,0 +1,47 @@
+version: "3.8"
+
+networks:
+  prisonnier-network:
+    driver: bridge
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_DATABASE: prisonniers
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - prisonnier-network
+
+  prisonnier-backend:
+    build:
+      context: ./prisonnier-backend
+      dockerfile: Dockerfile
+    container_name: prisonnier-backend
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080"
+    networks:
+      - prisonnier-network
+
+  prisonnier-frontend:
+    build:
+      context: ./prisonnier-front
+      dockerfile: Dockerfile
+    container_name: prisonnier-front
+    depends_on:
+      - prisonnier-backend
+    ports:
+      - "80:80"
+    networks:
+      - prisonnier-network
+
+volumes:
+  mysql_data:

@@ -1,0 +1,56 @@
+<div class="join-game-container">
+  <h2>Rejoindre une Partie</h2>
+  <form (ngSubmit)="onJoinGame()" #joinGameForm="ngForm">
+    <!-- Champ pour l'ID de la Partie -->
+    <div class="form-group">
+      <label for="gameId">ID de la Partie :</label>
+      <input
+        type="number"
+        id="gameId"
+        name="gameId"
+        [(ngModel)]="gameId"
+        required
+        placeholder="Entrez l'ID de la Partie"
+        #gameIdInput="ngModel"
+      />
+      <div *ngIf="gameIdInput.invalid && gameIdInput.touched" class="error">
+        Veuillez entrer un ID de partie valide.
+      </div>
+    </div>
+
+    <!-- Champ pour le nom du joueur -->
+    <div class="form-group">
+      <label for="playerName">Nom du Joueur :</label>
+      <input
+        type="text"
+        id="playerName"
+        name="playerName"
+        [(ngModel)]="playerName"
+        required
+        placeholder="Entrez votre nom"
+        #playerNameInput="ngModel"
+      />
+      <div *ngIf="playerNameInput.invalid && playerNameInput.touched" class="error">
+        Veuillez entrer un nom de joueur.
+      </div>
+    </div>
+
+    <!-- Boutons -->
+    <div class="button-group">
+      <button
+        type="submit"
+        [disabled]="joinGameForm.invalid"
+        pButton
+        label="Rejoindre"
+        class="p-button-success"
+      ></button>
+      <button
+        type="button"
+        (click)="onQuit()"
+        pButton
+        label="Quitter"
+        class="p-button-secondary"
+      ></button>
+    </div>
+  </form>
+</div>

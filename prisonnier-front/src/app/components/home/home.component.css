@@ -1,0 +1,138 @@
+/* Style général */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+  }
+  
+  /* Hero Section (image de fond avec texte) */
+  .hero-section {
+    background-image: url('/assets/game-background.jpg'); /* Remplacez par l'image appropriée */
+    background-size: cover;
+    background-position: center;
+    height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: white;
+    text-align: center;
+  }
+  
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+  }
+  
+  .hero-content {
+    z-index: 2;
+    max-width: 800px;
+    animation: fade-in 1.5s ease-in-out;
+  }
+  
+  .hero-content h1 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .hero-content p {
+    font-size: 1.5rem;
+    line-height: 1.8;
+    margin-bottom: 0;
+  }
+  
+  /* Rules Section */
+  .rules-section {
+    padding: 50px 20px;
+    background-color: #fff;
+    text-align: center;
+    margin: 30px auto;
+    max-width: 900px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: slide-up 1.5s ease-in-out;
+  }
+  
+  .rules-section h2 {
+    font-size: 2.8rem;
+    color: #333;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    border-bottom: 3px solid #007bff;
+    display: inline-block;
+  }
+  
+  .rules-section p {
+    font-size: 1.2rem;
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+  
+  .rules-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+  }
+  
+  .rules-section ul li {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 10px 0;
+    padding-left: 20px;
+    position: relative;
+    text-align: left;
+  }
+  
+  .rules-section ul li::before {
+    content: '✔';
+    position: absolute;
+    left: 0;
+    color: #28a745;
+    font-size: 1.5rem;
+  }
+  
+  .rules-section em {
+    color: #007bff;
+    font-weight: bold;
+    font-style: italic;
+  }
+  
+  /* Animations */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fade-in {
+    animation: fade-in 1.5s ease-in-out;
+  }
+  
+  .animate-slide-up {
+    animation: slide-up 1.5s ease-in-out;
+  }
+  

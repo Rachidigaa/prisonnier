@@ -1,0 +1,71 @@
+<div class="game-container">
+  <h2>Partie en cours</h2>
+
+  <!-- Conteneur d'image avec animation -->
+  <div class="image-container">
+    <img
+      *ngIf="!isGameFinished"
+      [src]="currentImage"
+      [class]="animationClass"
+      alt="Jeu en cours"
+    />
+    <img
+      *ngIf="isGameFinished"
+      [src]="endGameImage"
+      class="end-game-image"
+      alt="Fin de la partie"
+    />
+  </div>
+
+  <!-- Actions des joueurs -->
+  <div *ngIf="!isGameFinished">
+    <h3>Tour actuel : {{ currentRound }}/{{ totalRounds }}</h3>
+    <p *ngIf="!isWaiting">Choisissez votre action :</p>
+    <p *ngIf="isWaiting">En attente de l'autre joueur...</p>
+
+    <button
+      (click)="submitMove('COOPERER')"
+      (mouseenter)="changeImage('COOPERER')"
+      (mouseleave)="resetImage()"
+      [disabled]="isWaiting"
+    >
+      Coopérer
+    </button>
+    <button
+      (click)="submitMove('TRAHIR')"
+      (mouseenter)="changeImage('TRAHIR')"
+      (mouseleave)="resetImage()"
+      [disabled]="isWaiting"
+    >
+      Trahir
+    </button>
+
+    <!-- Dropdown pour sélectionner une stratégie -->
+    <div>
+      <button (click)="toggleDropdown()">Abandonner</button>
+
+      <div *ngIf="isDropdownVisible" class="dropdown">
+        <label for="strategy-select">Choisissez une stratégie :</label>
+        <select id="strategy-select" [(ngModel)]="selectedStrategy">
+          <option *ngFor="let strategy of strategies" [value]="strategy">
+            {{ strategy }}
+          </option>
+        </select>
+        <button (click)="abandonGame()">Valider</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Score final -->
+  <div *ngIf="isGameFinished">
+    <h3>Partie terminée</h3>
+    <p>Score final :</p>
+    <ul>
+      <li *ngFor="let player of players">
+        {{ player.name }} : {{ player.score }} points
+      </li>
+    </ul>
+    <button (click)="quitGame()">Quitter</button>
+  </div>
+</div>
+
