@@ -1,0 +1,25 @@
+<p-menubar styleClass="custom-menubar">
+  <ng-template pTemplate="start">
+    <div class="logo" (click)="navigateToHome()">
+      <img src="assets/logo.jpg" alt="Logo du Jeu" />
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    <div class="menu">
+      <button
+        pButton
+        label="Créer une Partie"
+        icon="pi pi-plus"
+        styleClass="p-button-outlined create-btn"
+        (click)="navigateTo('create')"
+      ></button>
+      <button
+        pButton
+        label="Rejoindre une Partie"
+        icon="pi pi-sign-in"
+        styleClass="p-button-outlined join-btn"
+        (click)="navigateTo('join')"
+      ></button>
+    </div>
+  </ng-template>
+</p-menubar>

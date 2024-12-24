@@ -1,0 +1,11 @@
+<div class="waiting-room-container">
+    <h2>En attente d'un autre joueur...</h2>
+    <p>Votre partie est en cours de préparation. Un autre joueur doit se connecter.</p>
+    <div class="status">
+      <p>Statut de la partie : <strong>{{ gameStatus?.status }}</strong></p>
+      <p>Joueurs connectés : <strong>1/2</strong></p>
+    </div>-
+    <button *ngIf="gameStatus?.isFull" (click)="startGame()">Commencer la Partie</button>
+    <button (click)="quitGame()">Quitter la Partie</button>
+  </div>
+  

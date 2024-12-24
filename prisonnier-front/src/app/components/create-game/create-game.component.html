@@ -1,0 +1,38 @@
+<div class="create-game-container">
+    <h2>Créer une Partie</h2>
+    <form (ngSubmit)="onCreateGame()" #gameForm="ngForm">
+      <!-- Nom du joueur -->
+      <div class="form-group">
+        <label for="playerName">Nom du Joueur :</label>
+        <input
+          type="text"
+          id="playerName"
+          name="playerName"
+          [(ngModel)]="playerName"
+          required
+          placeholder="Entrez votre nom"
+        />
+      </div>
+  
+      <!-- Nombre de tours -->
+      <div class="form-group">
+        <label for="rounds">Nombre de Tours :</label>
+        <input
+          type="number"
+          id="rounds"
+          name="rounds"
+          [(ngModel)]="rounds"
+          required
+          min="1"
+          placeholder="Entrez le nombre de tours"
+        />
+      </div>
+  
+      <!-- Boutons -->
+      <div class="button-group">
+        <button type="submit" [disabled]="!gameForm.form.valid">Créer</button>
+        <button type="button" (click)="onQuit()">Quitter</button>
+      </div>
+    </form>
+  </div>
+  
