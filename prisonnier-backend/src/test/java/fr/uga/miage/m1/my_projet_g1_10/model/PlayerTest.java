@@ -1,7 +1,9 @@
 package fr.uga.miage.m1.my_projet_g1_10.model;
 
-import fr.uga.miage.m1.my_projet_g1_10.enums.Decision;
-import fr.uga.miage.m1.my_projet_g1_10.enums.Strategie;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Game;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Player;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Decision;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Strategie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

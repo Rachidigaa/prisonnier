@@ -1,6 +1,7 @@
 package fr.uga.miage.m1.my_projet_g1_10.strategies;
 
-import fr.uga.miage.m1.my_projet_g1_10.enums.Decision;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Decision;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.strategies.Rancunier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

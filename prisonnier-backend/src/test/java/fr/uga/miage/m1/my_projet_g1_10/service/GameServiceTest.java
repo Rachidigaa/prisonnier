@@ -1,14 +1,16 @@
 package fr.uga.miage.m1.my_projet_g1_10.service;
 
-import fr.uga.miage.m1.my_projet_g1_10.Repository.GameRepository;
-import fr.uga.miage.m1.my_projet_g1_10.Repository.PlayerRepository;
-import fr.uga.miage.m1.my_projet_g1_10.enums.Decision;
-import fr.uga.miage.m1.my_projet_g1_10.enums.Strategie;
-import fr.uga.miage.m1.my_projet_g1_10.model.Game;
-import fr.uga.miage.m1.my_projet_g1_10.model.Player;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.service.GameService;
+import fr.uga.miage.m1.my_projet_g1_10.persistence.mysql.GameJpaRepository;
+import fr.uga.miage.m1.my_projet_g1_10.persistence.mysql.PlayerJpaRepository;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Decision;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Strategie;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Game;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Player;
+import fr.uga.miage.m1.my_projet_g1_10.core.repositories.GameRepository;
+import fr.uga.miage.m1.my_projet_g1_10.core.repositories.PlayerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,20 +23,27 @@ import static org.mockito.Mockito.*;
 
 class GameServiceTest {
 
-    private GameRepository gameRepository;
-    private PlayerRepository playerRepository;
+    private GameJpaRepository gameJpaRepository;
+    private PlayerJpaRepository playerJpaRepository;
     private GameService gameService;
+
+    private GameRepository gameRepository;
+
+    private PlayerRepository playerRepository;
 
     @BeforeEach
     void setUp() {
+        gameJpaRepository = mock(GameJpaRepository.class);
+        playerJpaRepository = mock(PlayerJpaRepository.class);
         gameRepository = mock(GameRepository.class);
         playerRepository = mock(PlayerRepository.class);
+
         gameService = new GameService(gameRepository, playerRepository);
     }
 
     @Test
     void testCreateGame() {
-        when(gameRepository.save(any(Game.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(gameJpaRepository.save(any(Game.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Game game = gameService.createGame("Player1", 10);
 
@@ -53,7 +62,7 @@ class GameServiceTest {
         game.setPlayers(new ArrayList<>());
 
         when(gameRepository.findById(1L)).thenReturn(Optional.of(game));
-        when(playerRepository.save(any(Player.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(playerJpaRepository.save(any(Player.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Optional<Game> result = gameService.joinGame(1L, "Player2");
 
@@ -192,8 +201,8 @@ class GameServiceTest {
 
         game.setPlayers(List.of(player1, player2));
 
-        when(gameRepository.save(any(Game.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(playerRepository.save(any(Player.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(gameJpaRepository.save(any(Game.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(playerJpaRepository.save(any(Player.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         String result = gameService.processRoundEnd(game, player1, player2);
 
@@ -209,7 +218,7 @@ class GameServiceTest {
         player.setStrategie(Strategie.ALEATOIRE);
         player.setMoveHistory(List.of(Decision.COOPERER));
 
-        when(playerRepository.save(any(Player.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(playerJpaRepository.save(any(Player.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         gameService.submitOtherPlayerMove(player);
 
@@ -221,7 +230,7 @@ class GameServiceTest {
         Player player = new Player();
         player.setStrategie(Strategie.ALEATOIRE);
 
-        when(playerRepository.save(any(Player.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(playerJpaRepository.save(any(Player.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         gameService.generateAndSubmitMove(player);
 

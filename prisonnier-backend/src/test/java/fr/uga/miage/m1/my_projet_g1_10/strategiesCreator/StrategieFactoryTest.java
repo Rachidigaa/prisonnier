@@ -1,8 +1,8 @@
 package fr.uga.miage.m1.my_projet_g1_10.strategiesCreator;
 
-import fr.uga.miage.m1.my_projet_g1_10.enums.Strategie;
-import fr.uga.miage.m1.my_projet_g1_10.strategies.*;
-import fr.uga.miage.m1.my_projet_g1_10.strategiesCreators.StrategieFactory;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Strategie;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.strategies.*;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.strategiescreators.StrategieFactory;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
