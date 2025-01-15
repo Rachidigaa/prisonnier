@@ -20,5 +20,5 @@ jobs:
       - name: Execute deployment script via SSH
         run: |
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} \
-          "cd ~/prisonnier && git pull --rebase=false && sudo docker compose up --build -d --force-recreate"
+          "cd ~/prisonnier && git pull --allow-unrelated-histories && sudo docker compose up --build -d --force-recreate"
 
