@@ -15,7 +15,26 @@
       <p *ngIf="!player.currentMove">Pas encore joué</p>
     </div>
   </div>
-
+  <div class="image-container">
+    <img
+      *ngIf="!isGameFinished"
+      [src]="currentImage"
+      [class]="animationClass"
+      alt="Jeu en cours"
+    />
+    <img
+      *ngIf="isGameFinished"
+      [src]="endGameImage"
+      class="end-game-image"
+      alt="Fin de la partie"
+    />
+  <!-- Game Status -->
+  <div class="game-status-panel">
+    <h2>Partie en cours</h2>
+    <p class="rounds">Tour : {{ currentRound }}/{{ totalRounds }}</p>
+    <p class="status">{{ isGameFinished ? 'Partie Terminée' : 'Partie en Cours' }}</p>
+  </div>
+  </div>
   <!-- Action Buttons -->
   <div *ngIf="!isGameFinished" class="action-buttons">
     <button

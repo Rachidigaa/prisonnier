@@ -159,6 +159,25 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   quitGame(): void {
-    this.router.navigate(['/home']);
+    if (!this.strategies.length) {
+      this.loadStrategies();
+    }
+    this.isDropdownVisible = true; // Display the dropdown to choose a strategy
+  }
+
+  confirmQuit(): void {
+    if (this.selectedStrategy) {
+      this.gameService.quitGame(this.playerId, this.selectedStrategy).subscribe(
+        (response: any) => {
+          alert(response.message);
+          this.router.navigate(['/home']); // Navigate home after quitting
+        },
+        (error) => {
+          console.error('Erreur lors de la tentative de quitter le jeu:', error);
+        }
+      );
+    } else {
+      alert('Veuillez sélectionner une stratégie pour quitter le jeu.');
+    }
   }
 }
