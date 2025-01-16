@@ -1,11 +1,25 @@
 <div class="waiting-room-container">
-    <h2>En attente d'un autre joueur...</h2>
-    <p>Votre partie est en cours de préparation. Un autre joueur doit se connecter.</p>
-    <div class="status">
-      <p>Statut de la partie : <strong>{{ gameStatus?.status }}</strong></p>
-      <p>Joueurs connectés : <strong>1/2</strong></p>
-    </div>-
-    <button *ngIf="gameStatus?.isFull" (click)="startGame()">Commencer la Partie</button>
-    <button (click)="quitGame()">Quitter la Partie</button>
+  <h2>Salle d'Attente</h2>
+  <div class="game-info">
+    <p>Statut de la partie : <strong>{{ gameStatus?.status }}</strong></p>
+    <p>Nombre de tours : <strong>{{ gameStatus?.rounds }}</strong></p>
   </div>
-  
+
+  <div class="player-list">
+    <h3>Joueurs Connectés</h3>
+    <div class="player-card" *ngFor="let player of gameStatus?.players">
+      <h4>{{ player.name }}</h4>
+      <p>Score : {{ player.score }}</p>
+    </div>
+  </div>
+
+  <div *ngIf="!gameStatus?.isFull" class="loader">
+    <p>En attente d'un autre joueur...</p>
+    <div class="spinner"></div>
+  </div>
+
+  <div class="actions">
+    <button *ngIf="gameStatus?.isFull" (click)="startGame()">Commencer la Partie</button>
+    <button (click)="quitGame()">Quitter</button>
+  </div>
+</div>
