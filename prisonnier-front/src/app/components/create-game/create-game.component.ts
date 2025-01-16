@@ -6,7 +6,7 @@ import { FormsModule, NgModel } from '@angular/forms';
 @Component({
   selector: 'app-create-game',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule,CommonModule],
   templateUrl: './create-game.component.html',
   styleUrl: './create-game.component.css'
 })

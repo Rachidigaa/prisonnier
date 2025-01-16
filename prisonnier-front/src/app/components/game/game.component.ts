@@ -24,9 +24,10 @@ export class GameComponent implements OnInit, OnDestroy {
   strategies: string[] = [];
   selectedStrategy: string = '';
   isDropdownVisible: boolean = false;
-  intervalId: any; // Stocker la référence de l'intervalle
+  intervalId: any;
+  highestScore: number = 0; // Added this property
 
-  // Gestion des images
+  // Image management
   defaultImage: string = 'assets/jouer1.jpg';
   coopImage: string = 'assets/cooperer1.jpg';
   betrayImage: string = 'assets/trahir1.jpg';
@@ -53,7 +54,7 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.clearPolling(); // Arrêter le polling lorsque le composant est détruit
+    this.clearPolling();
   }
 
   loadStrategies(): void {
@@ -70,8 +71,8 @@ export class GameComponent implements OnInit, OnDestroy {
     if (this.selectedStrategy) {
       this.gameService.quitGame(this.playerId, this.selectedStrategy).subscribe(
         (response: any) => {
-          alert(response.message); // Affiche le message du backend
-          this.router.navigate(['/home']); // Retour à l'accueil
+          alert(response.message);
+          this.router.navigate(['/home']);
         },
         (error) => {
           console.error('Erreur lors de l’abandon :', error);
@@ -98,11 +99,11 @@ export class GameComponent implements OnInit, OnDestroy {
       }
 
       if (this.isGameFinished) {
-        this.clearPolling(); // Arrêtez le polling si la partie est terminée
-        const maxScore = Math.max(...this.players.map((player: any) => player.score));
+        this.clearPolling();
+        this.highestScore = Math.max(...this.players.map((player: any) => player.score));
         const currentPlayerScore = this.currentPlayer ? this.currentPlayer.score : 0;
         this.endGameImage =
-          currentPlayerScore === maxScore ? this.winnerImage : this.loserImage;
+          currentPlayerScore === this.highestScore ? this.winnerImage : this.loserImage;
       }
     });
   }
@@ -117,7 +118,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
   clearPolling(): void {
     if (this.intervalId) {
-      clearInterval(this.intervalId); // Supprime l'intervalle
+      clearInterval(this.intervalId);
     }
   }
 
@@ -127,12 +128,12 @@ export class GameComponent implements OnInit, OnDestroy {
     this.isWaiting = true;
     this.gameService.playRound(this.gameId, this.playerId, move).subscribe(
       (response: any) => {
-        console.log(response.message); // Affiche le message dans la console
+        console.log(response.message);
         this.loadGameStatus();
       },
       (error) => {
         console.error('Erreur lors de la soumission du mouvement', error);
-        this.isWaiting = false; // Permet de rejouer en cas d'erreur
+        this.isWaiting = false;
       }
     );
   }
