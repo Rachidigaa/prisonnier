@@ -1,3 +1,13 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
 .logo {
   display: flex;
   align-items: center;
@@ -7,21 +17,30 @@
 .logo img {
   width: 50px;
   height: 50px;
+  margin-right: 10px;
 }
 
-.menu {
+.logo h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.nav-menu {
   display: flex;
-  align-items: center;
-  gap: 10px; /* Espacement entre les boutons */
+  gap: 15px;
 }
 
-.gray-btn {
-  background-color: var(--gray-300) !important; /* Couleur grise pour le bouton */
-  color: #000 !important; /* Texte noir */
-  border: none !important; /* Supprime la bordure */
+.menu-btn {
+  background-color: white;
+  color: #007bff;
+  border: none;
+  padding: 8px 15px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-p-menubar {
-  border-radius: 8px; /* Coins arrondis */
-  padding: 10px 20px; /* Espacement intérieur */
+.menu-btn:hover {
+  background-color: #0056b3;
+  color: white;
 }

@@ -1,25 +1,10 @@
-<p-menubar styleClass="custom-menubar">
-  <ng-template pTemplate="start">
-    <div class="logo" (click)="navigateToHome()">
-      <img src="assets/logo.jpg" alt="Logo du Jeu" />
-    </div>
-  </ng-template>
-  <ng-template pTemplate="end">
-    <div class="menu">
-      <button
-        pButton
-        label="Créer une Partie"
-        icon="pi pi-plus"
-        styleClass="p-button-outlined create-btn"
-        (click)="navigateTo('create')"
-      ></button>
-      <button
-        pButton
-        label="Rejoindre une Partie"
-        icon="pi pi-sign-in"
-        styleClass="p-button-outlined join-btn"
-        (click)="navigateTo('join')"
-      ></button>
-    </div>
-  </ng-template>
-</p-menubar>
+<header class="header">
+  <div class="logo" (click)="navigateToHome()">
+    <img src="assets/logo.jpg" alt="Game Logo" />
+    <h1>Prisonnier Game</h1>
+  </div>
+  <nav class="nav-menu">
+    <button pButton label="Créer une Partie" (click)="navigateTo('create')" class="menu-btn"></button>
+    <button pButton label="Rejoindre une Partie" (click)="navigateTo('join')" class="menu-btn"></button>
+  </nav>
+</header>
