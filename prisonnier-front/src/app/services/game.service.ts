@@ -14,7 +14,7 @@ interface Game {
   providedIn: 'root',
 })
 export class GameService {
-  private apiUrl = 'http://localhost:8080/game'; // URL de ton backend
+  private apiUrl = 'http://localhost/api/game'; // URL de ton backend
 
   constructor(private http: HttpClient) {}
 
