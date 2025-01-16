@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { GameService } from '../../services/game.service';
 import { Router } from '@angular/router';
 import { FormsModule, NgModel } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-create-game',
