@@ -1,6 +1,6 @@
-package com.example.demo.core.domain.model;
+package fr.uga.miage.m1.my_projet_g1_10.core.domain.model;
 
-import com.example.demo.core.domain.enums.GameState;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.GameState;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -23,18 +23,18 @@ public class Game {
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    @OrderBy("id ASC") // Ensures rounds are ordered by their ID
+    @OrderBy("id ASC")
     private List<Round> rounds = new ArrayList<>();
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Player> players = new ArrayList<>();
 
-    // Default constructor
+   
     public Game() {
     }
 
-    // Getters and setters
+   
     public Long getId() {
         return id;
     }
@@ -81,7 +81,7 @@ public class Game {
         this.rounds = rounds;
     }
 
-    // Utility methods
+   
     public void addPlayer(Player player) {
         players.add(player);
         player.setGame(this);

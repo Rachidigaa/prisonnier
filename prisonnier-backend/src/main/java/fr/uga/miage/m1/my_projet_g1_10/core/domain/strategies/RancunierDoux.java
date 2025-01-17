@@ -1,6 +1,6 @@
-package com.example.demo.core.domain.strategies;
+package fr.uga.miage.m1.my_projet_g1_10.core.domain.strategies;
 
-import com.example.demo.core.domain.enums.Decision;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Decision;
 
 import java.util.List;
 
@@ -12,30 +12,30 @@ public class RancunierDoux implements IStrategie {
     @Override
     public Decision decider(List<Decision> opponent) {
         if (opponent.isEmpty()) {
-            return Decision.COOPERER; // Start by cooperating
+            return Decision.COOPERER;
         }
 
         Decision lastOpponentMove = opponent.get(opponent.size() - 1);
 
-        // Trigger punishment mode if opponent betrays and we are not already punishing
+       
         if (lastOpponentMove == Decision.TRAHIR && !punishmentMode) {
             punishmentMode = true;
-            punishmentStep = 0;  // Reset punishment step
+            punishmentStep = 0; 
         }
 
-        // If in punishment mode, follow the sequence of t,t,t,t,c,c
+       
         if (punishmentMode) {
-            Decision currentDecision = (punishmentStep < 4) ? Decision.TRAHIR : Decision.COOPERER; // First 4 steps are betrayals, then 2 cooperations
+            Decision currentDecision = (punishmentStep < 4) ? Decision.TRAHIR : Decision.COOPERER;
             punishmentStep++;
 
-            // End punishment mode after completing the sequence
+           
             if (punishmentStep >= 6) {
                 punishmentMode = false;
             }
             return currentDecision;
         }
 
-        // Default to cooperation if not in punishment mode
+       
         return Decision.COOPERER;
     }
 }

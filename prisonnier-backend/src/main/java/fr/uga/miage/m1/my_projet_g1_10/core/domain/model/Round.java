@@ -1,6 +1,6 @@
-package com.example.demo.core.domain.model;
+package fr.uga.miage.m1.my_projet_g1_10.core.domain.model;
 
-import com.example.demo.core.domain.enums.Decision;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Decision;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
@@ -31,11 +31,11 @@ public class Round {
     @JsonBackReference
     private Game game;
 
-    // Default constructor
+   
     public Round() {
     }
 
-    // Getters and setters
+   
     public Long getId() {
         return id;
     }
@@ -68,7 +68,7 @@ public class Round {
         this.game = game;
     }
 
-    // Utility methods
+   
     public void addDecision(Long playerId, Decision decision) {
         decisions.put(playerId, decision);
     }

@@ -1,8 +1,8 @@
-package com.example.demo.core.domain.model;
+package fr.uga.miage.m1.my_projet_g1_10.core.domain.model;
 
-import com.example.demo.core.domain.enums.Strategie;
-import com.example.demo.core.domain.strategies.IStrategie;
-import com.example.demo.core.domain.strategiesCreators.StrategieFactory;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Strategie;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.strategies.IStrategie;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.strategiesCreators.StrategieFactory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -19,7 +19,7 @@ public class Player {
     private int score;
 
     private boolean hasPlayed;
-
+    private boolean isAutoPlayer = false;
     @Enumerated(EnumType.STRING)
     private Strategie strategy;
 
@@ -31,11 +31,11 @@ public class Player {
     @JsonIgnore
     private IStrategie strategyImplementation;
 
-    // Default constructor
+   
     public Player() {
     }
 
-    // Getters and setters
+   
     public Long getId() {
         return id;
     }
@@ -55,7 +55,13 @@ public class Player {
     public int getScore() {
         return score;
     }
+    public boolean isAutoPlayer() {
+        return isAutoPlayer;
+    }
 
+    public void setAutoPlayer(boolean autoPlayer) {
+        isAutoPlayer = autoPlayer;
+    }
     public void setScore(int score) {
         this.score = score;
     }
@@ -78,6 +84,9 @@ public class Player {
     }
 
     public IStrategie getStrategyImplementation() {
+        if (strategyImplementation == null && strategy != null) {
+            this.strategyImplementation = StrategieFactory.getStrategie(strategy);
+        }
         return strategyImplementation;
     }
 

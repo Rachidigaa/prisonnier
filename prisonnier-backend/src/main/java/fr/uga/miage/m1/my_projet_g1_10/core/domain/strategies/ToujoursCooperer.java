@@ -1,6 +1,6 @@
-package com.example.demo.core.domain.strategies;
+package fr.uga.miage.m1.my_projet_g1_10.core.domain.strategies;
 
-import com.example.demo.core.domain.enums.Decision;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Decision;
 
 import java.util.List;
 public class ToujoursCooperer implements IStrategie {

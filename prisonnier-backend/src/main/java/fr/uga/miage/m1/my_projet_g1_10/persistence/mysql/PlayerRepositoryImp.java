@@ -1,8 +1,8 @@
-package fr.uga.miage.m1.my_projet_g1_10.mysql;
+package fr.uga.miage.m1.my_projet_g1_10.persistence.mysql;
 
 
-import com.example.demo.core.domain.model.Player;
-import com.example.demo.core.repository.PlayerRepository;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Player;
+import fr.uga.miage.m1.my_projet_g1_10.core.repository.PlayerRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 

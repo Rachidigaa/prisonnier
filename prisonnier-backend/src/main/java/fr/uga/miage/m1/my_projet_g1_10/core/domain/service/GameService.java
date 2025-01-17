@@ -1,15 +1,15 @@
-package com.example.demo.core.domain.service;
+package fr.uga.miage.m1.my_projet_g1_10.core.domain.service;
 
-import com.example.demo.core.domain.enums.Decision;
-import com.example.demo.core.domain.enums.GameState;
-import com.example.demo.core.domain.enums.Strategie;
-import com.example.demo.core.domain.model.Game;
-import com.example.demo.core.domain.model.Player;
-import com.example.demo.core.domain.model.Round;
-import com.example.demo.core.usecase.GameServicePort;
-import com.example.demo.core.repository.GameRepository;
-import com.example.demo.core.repository.PlayerRepository;
-import com.example.demo.core.repository.RoundRepository;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Decision;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.GameState;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Strategie;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Game;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Player;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Round;
+import fr.uga.miage.m1.my_projet_g1_10.core.repository.GameRepository;
+import fr.uga.miage.m1.my_projet_g1_10.core.repository.PlayerRepository;
+import fr.uga.miage.m1.my_projet_g1_10.core.repository.RoundRepository;
+import fr.uga.miage.m1.my_projet_g1_10.core.usecase.GameServicePort;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -56,7 +56,7 @@ public class GameService implements GameServicePort {
                 }
                 gameRepository.save(game);
 
-                // Return both Game and Player ID
+               
                 Map<String, Object> response = new HashMap<>();
                 response.put("game", game);
                 response.put("playerId", savedPlayer.getId());
@@ -95,6 +95,18 @@ public class GameService implements GameServicePort {
         round.addDecision(playerId, decision);
         player.setHasPlayed(true);
         playerRepository.save(player);
+        Player autoPlayer = game.getPlayers().stream()
+                .filter(p -> !p.getId().equals(playerId) && p.isAutoPlayer())
+                .findFirst()
+                .orElse(null);
+
+        if (autoPlayer != null && !autoPlayer.isHasPlayed()) {
+            List<Decision> opponentDecisions = getOpponentDecisions(game, autoPlayer.getId());
+            Decision autoDecision = autoPlayer.getStrategyImplementation().decider(opponentDecisions);
+            round.addDecision(autoPlayer.getId(), autoDecision);
+            autoPlayer.setHasPlayed(true);
+            playerRepository.save(autoPlayer);
+        }
 
         if (round.getDecisions().size() == 2) {
             calculateScores(round, game);
@@ -120,21 +132,32 @@ public class GameService implements GameServicePort {
             Optional<Player> optionalPlayer = playerRepository.findById(playerId);
             if (optionalPlayer.isPresent()) {
                 Player player = optionalPlayer.get();
-                game.removePlayer(player);
-                playerRepository.delete(player);
-
-                Player aiPlayer = new Player();
-                aiPlayer.setUsername("AI_Player_" + playerId);
-                aiPlayer.setStrategy(strategy);
-                aiPlayer.setGame(game);
-                aiPlayer.setScore(player.getScore());
-                aiPlayer.setHasPlayed(false);
-                game.addPlayer(aiPlayer);
-                playerRepository.save(aiPlayer);
+                player.setUsername(player.getUsername() + " (auto)");
+                player.setStrategy(strategy);
+                player.setHasPlayed(false);
+                player.setAutoPlayer(true);
+                playerRepository.save(player);
                 gameRepository.save(game);
+
             }
         }
     }
+    private List<Decision> getOpponentDecisions(Game game, Long autoPlayerId) {
+        List<Decision> opponentDecisions = new ArrayList<>();
+        for (Round round : game.getRounds()) {
+            Map<Long, Decision> decisions = round.getDecisions();
+            if (decisions.size() < 2) {
+                continue;
+            }
+            decisions.forEach((playerId, decision) -> {
+                if (!playerId.equals(autoPlayerId)) {
+                    opponentDecisions.add(decision);
+                }
+            });
+        }
+        return opponentDecisions;
+    }
+
     private void resetPlayersForNextRound(Game game) {
         for (Player player : game.getPlayers()) {
             player.setHasPlayed(false);
@@ -143,7 +166,7 @@ public class GameService implements GameServicePort {
     }
 
     private void calculateScores(Round round, Game game) {
-        // Extract player IDs
+       
         List<Long> playerIds = new ArrayList<>(round.getDecisions().keySet());
         if (playerIds.size() != 2) {
             throw new IllegalStateException("There must be exactly two players' decisions to calculate scores");
@@ -183,14 +206,14 @@ public class GameService implements GameServicePort {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
-        // Clone the game to avoid modifying the original entity
+       
         Game filteredGame = cloneGameWithoutPersistence(game);
 
-        // Process rounds to hide incomplete decisions
+       
         if (filteredGame.getCurrentRound() < filteredGame.getRounds().size()) {
             Round currentRound = filteredGame.getRounds().get(filteredGame.getCurrentRound());
 
-            // Mask decisions for the other player if the round is not complete
+           
             if (currentRound.getDecisions().size() < 2) {
                 currentRound.getDecisions().forEach((playerId, decision) -> {
                     if (!playerId.equals(requestingPlayerId)) {
@@ -210,7 +233,7 @@ public class GameService implements GameServicePort {
         clonedGame.setCurrentRound(originalGame.getCurrentRound());
         clonedGame.setState(originalGame.getState());
 
-        // Clone players
+       
         for (Player player : originalGame.getPlayers()) {
             Player clonedPlayer = new Player();
             clonedPlayer.setId(player.getId());
@@ -220,7 +243,7 @@ public class GameService implements GameServicePort {
             clonedGame.addPlayer(clonedPlayer);
         }
 
-        // Clone rounds
+       
         for (Round round : originalGame.getRounds()) {
             Round clonedRound = new Round();
             clonedRound.setId(round.getId());

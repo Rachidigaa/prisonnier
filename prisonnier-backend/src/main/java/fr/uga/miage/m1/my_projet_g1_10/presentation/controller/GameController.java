@@ -1,11 +1,11 @@
-package fr.uga.miage.m1.my_projet_g1_10;
+package fr.uga.miage.m1.my_projet_g1_10.presentation.controller;
 
-import com.example.demo.core.domain.enums.Decision;
-import com.example.demo.core.domain.enums.Strategie;
-import com.example.demo.core.domain.model.Game;
-import com.example.demo.core.domain.model.Round;
-import com.example.demo.core.usecase.GameControllerPort;
-import com.example.demo.core.usecase.GameServicePort;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Decision;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Strategie;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Game;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Round;
+import fr.uga.miage.m1.my_projet_g1_10.core.usecase.GameControllerPort;
+import fr.uga.miage.m1.my_projet_g1_10.core.usecase.GameServicePort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;

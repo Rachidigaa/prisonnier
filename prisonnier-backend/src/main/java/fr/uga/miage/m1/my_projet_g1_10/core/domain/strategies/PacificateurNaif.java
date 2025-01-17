@@ -1,14 +1,14 @@
-package com.example.demo.core.domain.strategies;
+package fr.uga.miage.m1.my_projet_g1_10.core.domain.strategies;
 
 
-import com.example.demo.core.domain.enums.Decision;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Decision;
 
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;
 
 public class PacificateurNaif implements IStrategie {
-    // Utilisation de SecureRandom pour des raisons de sécurité
+   
     private final Random random = new SecureRandom();
     private double probabiliteDeTrahir = 0.1;
 
@@ -18,7 +18,7 @@ public class PacificateurNaif implements IStrategie {
 
     @Override
     public Decision decider(List<Decision> opponent) {
-        // Générer une décision aléatoire pour trahir avec une petite probabilité
+       
         if (random.nextDouble() < probabiliteDeTrahir) {
             return Decision.TRAHIR;
         }

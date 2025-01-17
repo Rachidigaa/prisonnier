@@ -1,8 +1,8 @@
-package com.example.demo.core.domain.strategiesCreators;
+package fr.uga.miage.m1.my_projet_g1_10.core.domain.strategiesCreators;
 
 
-import com.example.demo.core.domain.enums.Strategie;
-import com.example.demo.core.domain.strategies.*;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Strategie;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.strategies.*;
 
 public class StrategieFactory {
 
@@ -11,6 +11,7 @@ public class StrategieFactory {
     }
 
     public static IStrategie getStrategie(Strategie strategieEnum) {
+        System.out.println(strategieEnum);
         switch (strategieEnum) {
             case DONNANTDONNANT:
                 return new DonnantDonnant();

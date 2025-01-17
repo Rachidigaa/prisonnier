@@ -1,7 +1,7 @@
-package com.example.demo.core.domain.strategies;
+package fr.uga.miage.m1.my_projet_g1_10.core.domain.strategies;
 
 
-import com.example.demo.core.domain.enums.Decision;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Decision;
 
 import java.util.List;
 
@@ -17,9 +17,9 @@ public class Pavlov implements IStrategie {
     @Override
     public Decision decider(List<Decision> opponent) {
         if (lastScore == 5 || lastScore == 3) {
-            return lastDecision;  // Repeat last choice
+            return lastDecision; 
         } else {
-            // Alternate choice if last score was neither 5 nor 3
+           
             lastDecision = (lastDecision == Decision.COOPERER) ? Decision.TRAHIR : Decision.COOPERER;
             return lastDecision;
         }

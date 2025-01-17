@@ -1,7 +1,7 @@
-package com.example.demo.core.repository;
+package fr.uga.miage.m1.my_projet_g1_10.core.repository;
 
 
-import com.example.demo.core.domain.model.Player;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Player;
 
 import java.util.Optional;
 

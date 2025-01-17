@@ -1,9 +1,9 @@
-package com.example.demo.core.usecase;
+package fr.uga.miage.m1.my_projet_g1_10.core.usecase;
 
-import com.example.demo.core.domain.enums.Decision;
-import com.example.demo.core.domain.enums.Strategie;
-import com.example.demo.core.domain.model.Game;
-import com.example.demo.core.domain.model.Round;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Decision;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Strategie;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Game;
+import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Round;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

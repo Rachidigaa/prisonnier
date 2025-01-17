@@ -1,4 +1,4 @@
-package com.example.demo.core.exception;
+package fr.uga.miage.m1.my_projet_g1_10.core.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
