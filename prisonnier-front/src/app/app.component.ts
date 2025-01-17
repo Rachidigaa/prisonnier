@@ -22,7 +22,7 @@ export class AppComponent implements OnInit{
   ngOnInit(): void {}
 
   testCreateGame() {
-    this.gameService.createGame('Player1', 5).subscribe((res) => {
+    this.gameService.createGame(5).subscribe((res) => {
       this.response = res;
     });
   }

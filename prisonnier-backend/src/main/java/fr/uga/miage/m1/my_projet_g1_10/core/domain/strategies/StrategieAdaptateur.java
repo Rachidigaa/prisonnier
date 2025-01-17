@@ -1,8 +1,9 @@
-package fr.uga.miage.m1.my_projet_g1_10.core.domain.strategies;
+package com.example.demo.core.domain.strategies;
 
+
+import com.example.demo.core.domain.enums.Decision;
 import fr.uga.miage.g2_12.enums.TribeAction;
 import fr.uga.miage.g2_12.strategies.Strategy;
-import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Decision;
 
 import java.util.List;
 

@@ -1,298 +1,235 @@
-package fr.uga.miage.m1.my_projet_g1_10.core.domain.service;
+package com.example.demo.core.domain.service;
 
-import fr.uga.miage.m1.my_projet_g1_10.core.usecases.GameServicePort;
-import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Decision;
-import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Strategie;
-import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Game;
-import fr.uga.miage.m1.my_projet_g1_10.core.domain.model.Player;
-import fr.uga.miage.m1.my_projet_g1_10.core.repositories.GameRepository;
-import fr.uga.miage.m1.my_projet_g1_10.core.repositories.PlayerRepository;
-import fr.uga.miage.m1.my_projet_g1_10.core.domain.strategiescreators.StrategieFactory;
-import lombok.RequiredArgsConstructor;
+import com.example.demo.core.domain.enums.Decision;
+import com.example.demo.core.domain.enums.GameState;
+import com.example.demo.core.domain.enums.Strategie;
+import com.example.demo.core.domain.model.Game;
+import com.example.demo.core.domain.model.Player;
+import com.example.demo.core.domain.model.Round;
+import com.example.demo.core.usecase.GameServicePort;
+import com.example.demo.core.repository.GameRepository;
+import com.example.demo.core.repository.PlayerRepository;
+import com.example.demo.core.repository.RoundRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
-@Primary
-@RequiredArgsConstructor
 public class GameService implements GameServicePort {
 
-    private static final String MESSAGE="message";
-    private static final String FINISHED="FINISHED";
-    private static final String SCORES="scores";
-
-    @Qualifier("gameRepositoryImp")
     private final GameRepository gameRepository;
-
-    @Qualifier("playerRepositoryImp")
     private final PlayerRepository playerRepository;
+    private final RoundRepository roundRepository;
 
-
-    public Game createGame(String playerName, int rounds) {
-        Game game = new Game();
-        game.setRounds(rounds);
-
-        Player player = new Player();
-        player.setName(playerName);
-        player.setGame(game);
-
-        game.addPlayer(player);
-        gameRepository.save(game);
-        return game;
+    public GameService(@Qualifier("gameRepositoryImp") GameRepository gameRepository,
+                       @Qualifier("playerRepositoryImp") PlayerRepository playerRepository,
+                       @Qualifier("roundRepositoryImp") RoundRepository roundRepository) {
+        this.gameRepository = gameRepository;
+        this.playerRepository = playerRepository;
+        this.roundRepository = roundRepository;
     }
 
-    public Optional<Game> joinGame(Long gameId, String playerName) {
+    @Override
+    public Game createGame(int totalRounds) {
+        Game game = new Game();
+        game.setTotalRounds(totalRounds);
+        game.setState(GameState.WAITING_FOR_PLAYERS);
+        return gameRepository.save(game);
+    }
+
+    @Override
+    public Map<String, Object> joinGame(Long gameId, String username) {
         Optional<Game> optionalGame = gameRepository.findById(gameId);
         if (optionalGame.isPresent()) {
             Game game = optionalGame.get();
-            if (!game.isFull() && !game.isFinished()) {
+            if (game.getPlayers().size() < 2) {
                 Player player = new Player();
-                player.setName(playerName);
+                player.setUsername(username);
+                player.setStrategy(Strategie.ALEATOIRE);
                 player.setGame(game);
-                game.getPlayers().add(player);
+                game.addPlayer(player);
+                Player savedPlayer = playerRepository.save(player);
 
-                if (game.isFull()) {
-                    game.setStatus("STARTED");
+                if (game.getPlayers().size() == 2) {
+                    game.setState(GameState.IN_PROGRESS);
                 }
+                gameRepository.save(game);
 
-                playerRepository.save(player);
-                return Optional.of(game);
+                // Return both Game and Player ID
+                Map<String, Object> response = new HashMap<>();
+                response.put("game", game);
+                response.put("playerId", savedPlayer.getId());
+                return response;
             }
         }
-        return Optional.empty();
-    }
-
-    public Map<String, Object> playRound(Long gameId, Long playerId, String playerMove) {
-        Map<String, Object> response = new HashMap<>();
-
-        Optional<Game> optionalGame = gameRepository.findById(gameId);
-        if (optionalGame.isEmpty()) {
-            response.put(MESSAGE, "Game not found.");
-            return response;
-        }
-
-        Game game = optionalGame.get();
-
-        if (FINISHED.equals(game.getStatus())) {
-            response.put(MESSAGE, "Game is already finished.");
-            response.put(SCORES, getGameScores(game));
-            return response;
-        }
-
-        Optional<Player> optionalPlayer = playerRepository.findById(playerId);
-        if (optionalPlayer.isEmpty()) {
-            response.put(MESSAGE, "Player not found.");
-            return response;
-        }
-
-        Player currentPlayer = optionalPlayer.get();
-
-        if (currentPlayer.getCurrentMove() != null) {
-            response.put(MESSAGE, "Player has already submitted a move for this round.");
-            return response;
-        }
-
-        Decision decision = Decision.valueOf(playerMove);
-        submitPlayerMove(currentPlayer, decision);
-
-        Player otherPlayer = findOtherPlayer(game, playerId);
-
-        if (otherPlayer != null && !otherPlayer.getPresent()) {
-            submitOtherPlayerMove(otherPlayer);
-        }
-
-        if (otherPlayer != null && otherPlayer.getCurrentMove() != null) {
-            String result = processRoundEnd(game, currentPlayer, otherPlayer);
-            response.put(MESSAGE, result);
-            response.put(SCORES, getGameScores(game));
-            return response;
-        }
-
-        response.put(MESSAGE, "Waiting for the other player to submit their move.");
-        response.put(SCORES, getGameScores(game));
-        return response;
-    }
-
-    // Helper method to get scores
-    public Map<String, Integer> getGameScores(Game game) {
-        Map<String, Integer> scores = new HashMap<>();
-        for (Player player : game.getPlayers()) {
-            scores.put(player.getName(), player.getScore());
-        }
-        return scores;
+        throw new IllegalArgumentException("Game not found or already full.");
     }
 
 
+    @Override
+    public Optional<Round> playRound(Long gameId, Long playerId, Decision decision) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
+        if (game.getState() != GameState.IN_PROGRESS) {
+            throw new IllegalStateException("Game is not in progress");
+        }
 
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new IllegalArgumentException("Player not found"));
 
+        if (player.isHasPlayed()) {
+            throw new IllegalStateException("Player has already made their move");
+        }
 
-    public void submitPlayerMove(Player player, Decision decision) {
-        player.setCurrentMove(decision);
-        player.addMoves(decision);
+        Round round;
+        if (game.getRounds().size() <= game.getCurrentRound()) {
+            round = new Round();
+            game.addRound(round);
+            round = roundRepository.save(round);
+        } else {
+            round = game.getRounds().get(game.getCurrentRound());
+        }
+
+        round.addDecision(playerId, decision);
+        player.setHasPlayed(true);
         playerRepository.save(player);
-    }
 
-    public Player findOtherPlayer(Game game, Long playerId) {
-        return game.getPlayers().stream()
-                .filter(p -> !p.getId().equals(playerId))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public void submitOtherPlayerMove(Player otherPlayer) {
-        Decision decider = StrategieFactory.getStrategie(otherPlayer.getStrategie()).decider(otherPlayer.getMoveHistory());
-        otherPlayer.setCurrentMove(decider);
-        playerRepository.save(otherPlayer);
-    }
-
-    public String processRoundEnd(Game game, Player currentPlayer, Player otherPlayer) {
-        // Calculez les scores en fonction des mouvements
-        String result = compareMovesAndCalculateScore(currentPlayer, otherPlayer);
-
-        // Réinitialisez les mouvements des deux joueurs
-        resetMoves(currentPlayer, otherPlayer);
-
-        // Incrémentez le tour uniquement après avoir réinitialisé les mouvements
-        game.incrementRound();
-
-        // Si la partie est terminée, mettez à jour le statut
-        if (game.isFinished()) {
-            game.setStatus(FINISHED);
-            gameRepository.save(game); // Sauvegarder les modifications
-            return "Game finished! " + result;
+        if (round.getDecisions().size() == 2) {
+            calculateScores(round, game);
+            resetPlayersForNextRound(game);
+            game.incrementCurrentRound();
+            if (game.getCurrentRound() >= game.getTotalRounds()) {
+                game.setState(GameState.FINISHED);
+            }
         }
 
-        // Sauvegardez l'état actuel
+        roundRepository.save(round);
         gameRepository.save(game);
-        playerRepository.save(currentPlayer);
-        playerRepository.save(otherPlayer);
 
-        return result; // Retournez le résultat du tour
+        return Optional.of(round);
     }
 
 
-    public void resetMoves(Player currentPlayer, Player otherPlayer) {
-        currentPlayer.setCurrentMove(null);
-        otherPlayer.setCurrentMove(null);
-        playerRepository.save(currentPlayer);
-        playerRepository.save(otherPlayer);
-    }
-
-
-
-    public Map<String, Object> getGameStatus(Long gameId) {
+    @Override
+    public void abandonGame(Long gameId, Long playerId, Strategie strategy) {
         Optional<Game> optionalGame = gameRepository.findById(gameId);
-
         if (optionalGame.isPresent()) {
             Game game = optionalGame.get();
+            Optional<Player> optionalPlayer = playerRepository.findById(playerId);
+            if (optionalPlayer.isPresent()) {
+                Player player = optionalPlayer.get();
+                game.removePlayer(player);
+                playerRepository.delete(player);
 
-            // Préparez les informations sur le jeu et les joueurs
-            Map<String, Object> response = new HashMap<>();
-            response.put("status", game.getStatus());
-            response.put("currentRound", game.getCurrentRound());
-            response.put("rounds", game.getRounds());
-            response.put("players", game.getPlayers().stream().map(player -> {
-                Map<String, Object> playerData = new HashMap<>();
-                playerData.put("id", player.getId());
-                playerData.put("name", player.getName());
-                playerData.put("currentMove", player.getCurrentMove());
-                playerData.put("score", player.getScore());
-                return playerData;
-            }).toList());
-            return response;
+                Player aiPlayer = new Player();
+                aiPlayer.setUsername("AI_Player_" + playerId);
+                aiPlayer.setStrategy(strategy);
+                aiPlayer.setGame(game);
+                aiPlayer.setScore(player.getScore());
+                aiPlayer.setHasPlayed(false);
+                game.addPlayer(aiPlayer);
+                playerRepository.save(aiPlayer);
+                gameRepository.save(game);
+            }
+        }
+    }
+    private void resetPlayersForNextRound(Game game) {
+        for (Player player : game.getPlayers()) {
+            player.setHasPlayed(false);
+            playerRepository.save(player);
+        }
+    }
+
+    private void calculateScores(Round round, Game game) {
+        // Extract player IDs
+        List<Long> playerIds = new ArrayList<>(round.getDecisions().keySet());
+        if (playerIds.size() != 2) {
+            throw new IllegalStateException("There must be exactly two players' decisions to calculate scores");
         }
 
-        return Collections.emptyMap(); // Retournez null si le jeu n'existe pas
-    }
+        Long player1Id = playerIds.get(0);
+        Long player2Id = playerIds.get(1);
 
+        Decision player1Decision = round.getDecisions().get(player1Id);
+        Decision player2Decision = round.getDecisions().get(player2Id);
 
-
-
-    public String compareMovesAndCalculateScore(Player player1, Player player2) {
-        Decision move1 = player1.getCurrentMove();
-        Decision move2 = player2.getCurrentMove();
-
-        if (move1 == Decision.TRAHIR && move2 == Decision.TRAHIR) {
-            player1.incrementScore(1);
-            player2.incrementScore(1);
-            return "Both players betrayed. Both get 1 point.";
-        } else if (move1 == Decision.COOPERER && move2 == Decision.COOPERER) {
-            player1.incrementScore(3);
-            player2.incrementScore(3);
-            return "Both players cooperated. Both get 3 points.";
-        } else if (move1 == Decision.TRAHIR && move2 == Decision.COOPERER) {
-            player1.incrementScore(5);
-            player2.incrementScore(0);
-            return player1.getName() + " betrayed, " + player2.getName() + " cooperated. " + player1.getName() + " gets 5 points.";
-        } else if (move1 == Decision.COOPERER && move2 == Decision.TRAHIR) {
-            player1.incrementScore(0);
-            player2.incrementScore(5);
-            return player1.getName() + " cooperated, " + player2.getName() + " betrayed. " + player2.getName() + " gets 5 points.";
-        }
-        return "Error comparing moves.";
-    }
-
-    public String quitterPartie(Long playerId, String strategiePlayer) {
-        Strategie strategie = Strategie.valueOf(strategiePlayer);
-        Optional<Player> optionalPlayer = playerRepository.findById(playerId);
-        if (optionalPlayer.isPresent()) {
-            Player currentPlayer = optionalPlayer.get();
-            currentPlayer.changePresent(); // Changez ici au lieu de setPresent
-            currentPlayer.setStrategie(strategie); // Appliquez la stratégie choisie
-            playerRepository.save(currentPlayer);
-            return "Joueur " + currentPlayer.getName() + " a quitté la partie avec la stratégie " + strategiePlayer;
-        }
-        return "Player not found";
-    }
-
-
-    public Decision generateMove(Player player) {
-        // Utilisez une fabrique de stratégie pour générer un mouvement en fonction de la stratégie
-        return StrategieFactory.getStrategie(player.getStrategie()).decider(player.getMoveHistory());
-    }
-
-    public void generateAndSubmitMove(Player player) {
-        Decision move = generateMove(player);
-        player.setCurrentMove(move);
-        player.addMoves(move);
-        playerRepository.save(player);
-    }
-
-
-
-    public Map<String, Object> getGameScore(Long gameId) {
-        Optional<Game> optionalGame = gameRepository.findById(gameId);
-
-        if (optionalGame.isEmpty()) {
-            throw new IllegalArgumentException("Game not found.");
+        if (player1Decision == Decision.COOPERER && player2Decision == Decision.COOPERER) {
+            round.addScore(player1Id, 3);
+            round.addScore(player2Id, 3);
+        } else if (player1Decision == Decision.COOPERER && player2Decision == Decision.TRAHIR) {
+            round.addScore(player1Id, 0);
+            round.addScore(player2Id, 5);
+        } else if (player1Decision == Decision.TRAHIR && player2Decision == Decision.COOPERER) {
+            round.addScore(player1Id, 5);
+            round.addScore(player2Id, 0);
+        } else if (player1Decision == Decision.TRAHIR && player2Decision == Decision.TRAHIR) {
+            round.addScore(player1Id, 1);
+            round.addScore(player2Id, 1);
         }
 
-        Game game = optionalGame.get();
-
-        // Vérifiez si la partie est terminée
-        if (!FINISHED.equals(game.getStatus())) {
-            throw new IllegalArgumentException("Game is not finished yet.");
+        for (Player player : game.getPlayers()) {
+            Long playerId = player.getId();
+            if (round.getScores().containsKey(playerId)) {
+                int newScore = round.getScores().get(playerId);
+                player.setScore(player.getScore() + newScore);
+            }
         }
-
-        // Préparez les données des scores des joueurs
-        Map<String, Object> response = new HashMap<>();
-        response.put(SCORES, game.getPlayers().stream().map(player -> {
-            Map<String, Object> playerData = new HashMap<>();
-            playerData.put("id", player.getId());
-            playerData.put("name", player.getName());
-            playerData.put("score", player.getScore());
-            return playerData;
-        }).toList());
-
-        return response;
     }
 
+    @Override
+    public Game getGameStatus(Long gameId, Long requestingPlayerId) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new IllegalArgumentException("Game not found"));
+
+        // Clone the game to avoid modifying the original entity
+        Game filteredGame = cloneGameWithoutPersistence(game);
+
+        // Process rounds to hide incomplete decisions
+        if (filteredGame.getCurrentRound() < filteredGame.getRounds().size()) {
+            Round currentRound = filteredGame.getRounds().get(filteredGame.getCurrentRound());
+
+            // Mask decisions for the other player if the round is not complete
+            if (currentRound.getDecisions().size() < 2) {
+                currentRound.getDecisions().forEach((playerId, decision) -> {
+                    if (!playerId.equals(requestingPlayerId)) {
+                        currentRound.getDecisions().put(playerId, null);
+                    }
+                });
+            }
+        }
+
+        return filteredGame;
+    }
+
+    private Game cloneGameWithoutPersistence(Game originalGame) {
+        Game clonedGame = new Game();
+        clonedGame.setId(originalGame.getId());
+        clonedGame.setTotalRounds(originalGame.getTotalRounds());
+        clonedGame.setCurrentRound(originalGame.getCurrentRound());
+        clonedGame.setState(originalGame.getState());
+
+        // Clone players
+        for (Player player : originalGame.getPlayers()) {
+            Player clonedPlayer = new Player();
+            clonedPlayer.setId(player.getId());
+            clonedPlayer.setUsername(player.getUsername());
+            clonedPlayer.setScore(player.getScore());
+            clonedPlayer.setHasPlayed(player.isHasPlayed());
+            clonedGame.addPlayer(clonedPlayer);
+        }
+
+        // Clone rounds
+        for (Round round : originalGame.getRounds()) {
+            Round clonedRound = new Round();
+            clonedRound.setId(round.getId());
+            clonedRound.setDecisions(new HashMap<>(round.getDecisions()));
+            clonedRound.setScores(new HashMap<>(round.getScores()));
+            clonedGame.addRound(clonedRound);
+        }
+
+        return clonedGame;
+    }
 
 }

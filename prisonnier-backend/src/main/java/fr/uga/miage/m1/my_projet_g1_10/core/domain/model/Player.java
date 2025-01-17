@@ -1,12 +1,11 @@
-package fr.uga.miage.m1.my_projet_g1_10.core.domain.model;
+package com.example.demo.core.domain.model;
 
+import com.example.demo.core.domain.enums.Strategie;
+import com.example.demo.core.domain.strategies.IStrategie;
+import com.example.demo.core.domain.strategiesCreators.StrategieFactory;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Decision;
-import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Strategie;
 import jakarta.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class Player {
@@ -14,77 +13,79 @@ public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private int score = 0;  // Champ pour le score
-    private Decision currentMove;    // Stocke le choix du joueur pour le tour actuel ("cooperate" ou "betray")
 
-    private Strategie strategie;
+    private String username;
 
-    private Boolean present = true;
-    @ElementCollection
-    private List<Decision> moveHistory=new ArrayList<>();
+    private int score;
+
+    private boolean hasPlayed;
+
+    @Enumerated(EnumType.STRING)
+    private Strategie strategy;
 
     @ManyToOne
-    @JoinColumn(name = "game_id")
-    @JsonIgnore
+    @JsonBackReference
     private Game game;
 
-    // Getters et Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    @Transient
+    @JsonIgnore
+    private IStrategie strategyImplementation;
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public int getScore() { return score; }
-    public void incrementScore(int points) { this.score += points; }  // Méthode pour incrémenter le score
-
-    public Decision getCurrentMove() { return currentMove; }
-    public void setCurrentMove(Decision move) { this.currentMove = move; }  // Méthode pour définir le move
-
-    public Game getGame() { return game; }
-    public void setGame(Game game) { this.game = game; }
-
-    public List<Decision> getMoveHistory(){
-        return moveHistory;
+    // Default constructor
+    public Player() {
     }
-    public Decision getLastMove() {
-        if (!moveHistory.isEmpty()) {
-            return moveHistory.get(moveHistory.size() - 1);  // Retourne le dernier élément de moveHistory
-        } else {
-            return null;  // Retourne null si aucun mouvement n'a été fait
-        }
+
+    // Getters and setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public int getScore() {
+        return score;
     }
 
     public void setScore(int score) {
         this.score = score;
     }
 
-    public Strategie getStrategie() {
-        return strategie;
+    public boolean isHasPlayed() {
+        return hasPlayed;
     }
 
-    public void setStrategie(Strategie strategie) {
-        this.strategie = strategie;
+    public void setHasPlayed(boolean hasPlayed) {
+        this.hasPlayed = hasPlayed;
     }
 
-    public void changePresent(){
-        this.present = !this.present;
+    public Strategie getStrategy() {
+        return strategy;
     }
 
-    public Boolean getPresent() {
-        return present;
+    public void setStrategy(Strategie strategy) {
+        this.strategy = strategy;
+        this.strategyImplementation = StrategieFactory.getStrategie(strategy);
     }
 
-    public void addMoves(Decision decision){
-        this.moveHistory.add(decision);
+    public IStrategie getStrategyImplementation() {
+        return strategyImplementation;
     }
 
-    public void setMoveHistory(List<Decision> moveHistory) {
-        this.moveHistory = moveHistory;
+    public void setGame(Game game) {
+        this.game = game;
     }
 
-    public void setPresent(Boolean present) {
-        this.present = present;
+    public Game getGame() {
+        return game;
     }
 }

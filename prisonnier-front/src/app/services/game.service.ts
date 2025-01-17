@@ -1,78 +1,87 @@
+import { Strategie, Game, Decision, Round } from './../model/model';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
-interface Game {
-  id: number;
-  playerName: string;
-  rounds: number;
-  status: string;
+export interface JoinGameResponse {
+  game: Game;
+  playerId: number;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class GameService {
-  private apiUrl = '/api/game'; // URL of the backend
+  private apiUrl = environment.API_URL;
 
   constructor(private http: HttpClient) {}
 
-  // Method to create a game
-  createGame(playerName: string, rounds: number): Observable<any> {
-    const params = new HttpParams()
-      .set('playerName', playerName)
-      .set('rounds', rounds.toString());
-    return this.http.post<any>(`${this.apiUrl}/create`, {}, { params }).pipe(
-      tap((response) => console.log('Create Game Response:', response))
+  createGame(totalRounds: number): Observable<Game> {
+    const params = new HttpParams().set('totalRounds', totalRounds.toString());
+    return this.http.post<Game>(`${this.apiUrl}/create`, {}, { params }).pipe(
+      tap({
+        next: (response) => console.log('createGame Response:', response),
+        error: (error) => console.error('createGame Error:', error),
+      })
     );
   }
 
-  // Method to join a game
-  joinGame(gameId: number, playerName: string): Observable<any> {
+  joinGame(gameId: number, username: string): Observable<JoinGameResponse> {
     const params = new HttpParams()
       .set('gameId', gameId.toString())
-      .set('playerName', playerName);
-    return this.http.post<any>(`${this.apiUrl}/join`, {}, { params }).pipe(
-      tap((response) => console.log('Join Game Response:', response))
+      .set('username', username);
+    return this.http.post<JoinGameResponse>(`${this.apiUrl}/join`, {}, { params }).pipe(
+      tap({
+        next: (response) => console.log('joinGame Response:', response),
+        error: (error) => console.error('joinGame Error:', error),
+      })
     );
   }
 
-  // Method to play a round
-  playRound(gameId: number, playerId: number, move: string): Observable<string> {
+  playRound(gameId: number, playerId: number, decision: Decision): Observable<Round> {
     const params = new HttpParams()
       .set('gameId', gameId.toString())
       .set('playerId', playerId.toString())
-      .set('move', move);
-    return this.http.post<string>(`${this.apiUrl}/play`, {}, { params }).pipe(
-      tap((response) => console.log('Play Round Response:', response))
+      .set('decision', decision);
+    return this.http.post<Round>(`${this.apiUrl}/play`, {}, { params }).pipe(
+      tap({
+        next: (response) => console.log('playRound Response:', response),
+        error: (error) => console.error('playRound Error:', error),
+      })
     );
   }
 
-  // Method to get available strategies
-  getStrategies(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.apiUrl}/strategies`).pipe(
-      tap((response) => console.log('Get Strategies Response:', response))
+  abandonGame(gameId: number, playerId: number, strategy: Strategie): Observable<void> {
+    const params = new HttpParams()
+      .set('gameId', gameId.toString())
+      .set('playerId', playerId.toString())
+      .set('strategy', strategy);
+    return this.http.post<void>(`${this.apiUrl}/abandon`, {}, { params }).pipe(
+      tap({
+        next: () => console.log(`abandonGame Success: gameId=${gameId}, playerId=${playerId}`),
+        error: (error) => console.error('abandonGame Error:', error),
+      })
     );
   }
 
-  // Method to quit a game
-  quitGame(playerId: number, strategy: string): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(
-      `${this.apiUrl}/quitte`,
-      null,
-      {
-        params: { playerId: playerId.toString(), strategie: strategy },
-      }
-    ).pipe(
-      tap((response) => console.log('Quit Game Response:', response))
+  getGameStatus(gameId: number, playerId: number): Observable<Game> {
+    const params = new HttpParams().set('requestingPlayerId', playerId.toString());
+    return this.http.get<Game>(`${this.apiUrl}/${gameId}/status`, { params }).pipe(
+      tap({
+        next: (response) => console.log('getGameStatus Response:', response),
+        error: (error) => console.error('getGameStatus Error:', error),
+      })
     );
   }
-
-  // Method to get the game status
-  getGameStatus(gameId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${gameId}/status`).pipe(
-      tap((response) => console.log('Get Game Status Response:', response))
+  
+  getStrategies(): Observable<Strategie[]> {
+    return this.http.get<Strategie[]>(`${this.apiUrl}/strategies`).pipe(
+      tap({
+        next: (response) => console.log('getStrategies Response:', response),
+        error: (error) => console.error('getStrategies Error:', error),
+      })
     );
   }
 }

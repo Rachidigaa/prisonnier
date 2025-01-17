@@ -1,25 +1,21 @@
-<div class="waiting-room-container">
-  <h2>Salle d'Attente</h2>
-  <div class="game-info">
-    <p>Statut de la partie : <strong>{{ gameStatus?.status }}</strong></p>
-    <p>Nombre de tours : <strong>{{ gameStatus?.rounds }}</strong></p>
-  </div>
+<div class="container">
+  <h1>Salle d'Attente</h1>
 
-  <div class="player-list">
-    <h3>Joueurs Connectés</h3>
-    <div class="player-card" *ngFor="let player of gameStatus?.players">
-      <h4>{{ player.name }}</h4>
-      <p>Score : {{ player.score }}</p>
+  <div class="card">
+    <h2>ID de la Partie : <span class="game-id">{{ gameId }}</span></h2>
+    <div *ngIf="!isSecondPlayerJoined" class="spinner-container">
+      <div class="spinner"></div>
+      <p class="waiting-text">En attente de l'arrivée du second joueur...</p>
     </div>
+    <p *ngIf="isSecondPlayerJoined && !showModal" class="success-message">
+      Le second joueur a rejoint ! Préparation pour démarrer la partie...
+    </p>
   </div>
 
-  <div *ngIf="!gameStatus?.isFull" class="loader">
-    <p>En attente d'un autre joueur...</p>
-    <div class="spinner"></div>
-  </div>
-
-  <div class="actions">
-    <button *ngIf="gameStatus?.isFull" (click)="startGame()">Commencer la Partie</button>
-    <button (click)="quitGame()">Quitter</button>
+  <div *ngIf="showModal" class="modal-overlay">
+    <div class="modal">
+      <h2>La Partie Commence Bientôt !</h2>
+      <p>La partie commencera dans <span class="countdown">{{ countdown }}</span> secondes.</p>
+    </div>
   </div>
 </div>

@@ -1,88 +1,161 @@
-.game-container {
+.container {
   max-width: 800px;
-  margin: 20px auto;
+  margin: 0 auto;
   padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background: linear-gradient(to bottom, #f9f9f9, #e9e9e9);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
 }
 
-.game-status-panel {
+h1, h2, h3, h4 {
   text-align: center;
+}
+
+.card {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
   margin-bottom: 20px;
-}
-
-.game-status-panel h2 {
-  margin-bottom: 10px;
-  color: #007bff;
-}
-
-.game-status-panel .rounds {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-.game-status-panel .status {
-  color: #28a745;
-  font-weight: bold;
 }
 
 .player-cards {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 15px;
+  justify-content: space-around;
+  margin: 20px 0;
 }
 
 .player-card {
-  width: 150px;
+  flex: 1;
   padding: 15px;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 10px;
+  margin: 0 10px;
+  border-radius: 8px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.player-card h3 {
-  margin-bottom: 10px;
-  font-size: 1.1rem;
+.self-card {
+  background: #d4f0ff;
+  border: 1px solid #99d4f3;
 }
 
-.action-buttons {
+.enemy-card {
+  background: #ffd4d4;
+  border: 1px solid #f39999;
+}
+
+.actions {
   text-align: center;
   margin-top: 20px;
 }
 
-.action-buttons button {
-  margin: 0 10px;
+.actions .btn {
+  margin: 5px;
   padding: 10px 20px;
-  font-size: 1rem;
+  font-size: 16px;
+  cursor: pointer;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
+  color: white;
 }
 
 .cooperate-btn {
-  background-color: #28a745;
-  color: white;
+  background-color: #4caf50; 
 }
 
 .betray-btn {
-  background-color: #dc3545;
+  background-color: #f44336;
+}
+
+.quit-btn {
+  background-color: #333;
   color: white;
 }
 
-.cooperate-btn:hover,
-.betray-btn:hover {
-  opacity: 0.8;
+.btn:disabled {
+  background-color: #d3d3d3;
+  cursor: not-allowed;
+  color: #666;
 }
 
-.end-game-screen {
+
+.quit-container {
+  margin-top: 20px;
   text-align: center;
-  margin-top: 30px;
+}
+
+.strategy-dropdown {
+  margin: 10px 0;
+  padding: 8px;
+  font-size: 16px;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
+}
+.round-info {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 15px;
+}
+.round-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.round-table th, .round-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.round-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.round-summary {
+  margin-top: 20px;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
   padding: 20px;
-  background-color: #f1f1f1;
-  border-radius: 10px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+.modal-actions {
+  margin-top: 20px;
+}
+
+.modal-actions .btn {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  background-color: #4caf50;
+}
+
+.modal-actions .btn:nth-child(2) {
+  background-color: #333;
 }

@@ -13,32 +13,29 @@ import { CommonModule } from '@angular/common';
   styleUrl: './join-game.component.css'
 })
 export class JoinGameComponent {
-  gameId!: number;
+  gameId: number | null = null;
   playerName: string = '';
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
 
   constructor(private gameService: GameService, private router: Router) {}
-
-  // Logique pour rejoindre une partie
-  onJoinGame() {
-    this.gameService.joinGame(this.gameId, this.playerName).subscribe(
-      (response) => {
-        if (response) {
-          console.log(response)
-          this.router.navigate([`/game/${this.gameId}/${response.players[1].id}`]); // Redirige vers une page vide pour le moment
-        } else {
-          alert("Impossible de rejoindre la partie. Vérifiez l'ID ou l'état de la partie.");
-        }
-      },
-      (error) => {
-        alert("Une erreur s'est produite lors de la tentative de rejoindre la partie.");
-        console.error(error);
-      }
-    );
+  joinGame() {
+    if (this.gameId && this.playerName.trim()) {
+      this.errorMessage = null;
+      this.gameService
+        .joinGame(this.gameId, this.playerName.trim())
+        .subscribe(
+          (response) => {
+            this.router.navigate(['/waiting-room'], {
+              queryParams: { gameId: response.game.id, playerId: response.playerId },
+            });
+          },
+          (error) => {
+            this.errorMessage = 'Failed to join game. Please check the details.';
+          }
+        );
+    } else {
+      this.errorMessage = 'Please enter a valid player name.';
+    }
   }
-
-  // Quitter l'action
-  onQuit() {
-    this.router.navigate(['/home']); // Retour à la page d'accueil
-  }
-
 }

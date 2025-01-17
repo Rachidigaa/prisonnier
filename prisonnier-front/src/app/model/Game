@@ -1,7 +1,0 @@
-interface Game {
-  id: number;
-  playerName: string;
-  rounds: number;
-  status: string;
-  players : []
-}

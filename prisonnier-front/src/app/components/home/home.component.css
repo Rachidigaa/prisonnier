@@ -1,4 +1,4 @@
-/* Style général */
+
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
@@ -6,9 +6,8 @@ body {
     background-color: #f4f4f9;
   }
   
-  /* Hero Section (image de fond avec texte) */
   .hero-section {
-    background-image: url('/assets/game-background.jpg'); /* Remplacez par l'image appropriée */
+    background-image: url('/assets/game-background.jpg');
     background-size: cover;
     background-position: center;
     height: 70vh;
@@ -104,8 +103,7 @@ body {
     font-weight: bold;
     font-style: italic;
   }
-  
-  /* Animations */
+
   @keyframes fade-in {
     from {
       opacity: 0;

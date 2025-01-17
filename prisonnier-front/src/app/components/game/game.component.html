@@ -1,72 +1,122 @@
-<div class="game-container">
-  <!-- Game Status -->
-  <div class="game-status-panel">
-    <h2>Partie en cours</h2>
-    <p class="rounds">Tour : {{ currentRound }}/{{ totalRounds }}</p>
-    <p class="status">{{ isGameFinished ? 'Partie Terminée' : 'Partie en Cours' }}</p>
+<div class="container">
+  <h1>Salle de Jeu</h1>
+  <p class="round-info" *ngIf="game?.state !== 'FINISHED' && game">
+    Manche {{ game.currentRound + 1 }} sur {{ game.totalRounds }}
+  </p>
+  <div *ngIf="game?.state === 'FINISHED'" class="finished-message">
+    <h3>La partie est terminée !</h3>
   </div>
 
-  <!-- Player Cards -->
-  <div class="player-cards">
-    <div class="player-card" *ngFor="let player of players">
-      <h3>{{ player.name }}</h3>
-      <p>Score : {{ player.score }}</p>
-      <p *ngIf="player.currentMove">Dernier Coup : {{ player.currentMove }}</p>
-      <p *ngIf="!player.currentMove">Pas encore joué</p>
+  <div class="card" *ngIf="game">
+    <h2>ID du Jeu : <span class="game-id">{{ game.id }}</span></h2>
+
+    <div class="player-cards">
+      <div class="player-card self-card">
+        <h3>Vos Informations</h3>
+        <h4>{{ getPlayer()?.username }}</h4>
+        <p>Score : <strong>{{ getPlayer()?.score }}</strong></p>
+      </div>
+
+      <div class="player-card enemy-card">
+        <h3>Informations de l'Adversaire</h3>
+        <div *ngFor="let player of getEnemies()">
+          <h4>{{ player.username }}</h4>
+          <p>Score : <strong>{{ player.score }}</strong></p>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="image-container">
-    <img
-      *ngIf="!isGameFinished"
-      [src]="currentImage"
-      [class]="animationClass"
-      alt="Jeu en cours"
-    />
-    <img
-      *ngIf="isGameFinished"
-      [src]="endGameImage"
-      class="end-game-image"
-      alt="Fin de la partie"
-    />
-  <!-- Game Status -->
-  <div class="game-status-panel">
-    <h2>Partie en cours</h2>
-    <p class="rounds">Tour : {{ currentRound }}/{{ totalRounds }}</p>
-    <p class="status">{{ isGameFinished ? 'Partie Terminée' : 'Partie en Cours' }}</p>
-  </div>
-  </div>
-  <!-- Action Buttons -->
-  <div *ngIf="!isGameFinished" class="action-buttons">
-    <button
-      (click)="submitMove('COOPERER')"
-      [disabled]="isWaiting"
-      class="cooperate-btn"
-    >
-      Coopérer
-    </button>
-    <button
-      (click)="submitMove('TRAHIR')"
-      [disabled]="isWaiting"
-      class="betray-btn"
-    >
-      Trahir
-    </button>
   </div>
 
-  <!-- End Game Screen -->
-  <div *ngIf="isGameFinished" class="end-game-screen">
-    <h2>Partie Terminée</h2>
-    <div *ngIf="currentPlayer?.score === highestScore">
-      🎉 Félicitations {{ currentPlayer?.name }}, vous avez gagné ! 🎉
-    </div>
-    <div *ngIf="currentPlayer?.score !== highestScore">
-      😔 {{ currentPlayer?.name }}, vous avez perdu. Bonne chance la prochaine fois !
-    </div>
-    <ul>
-      <li *ngFor="let player of players">
-        {{ player.name }} : {{ player.score }} points
-      </li>
-    </ul>
-    <button (click)="quitGame()">Quitter</button>
+  <div class="actions" *ngIf="game">
+    <h3>Faites Votre choix</h3>
+    <button class="btn cooperate-btn" (click)="makeMove('COOPERER')" [disabled]="hasPlayed">Coopérer</button>
+    <button class="btn betray-btn" (click)="makeMove('TRAHIR')" [disabled]="hasPlayed">Trahir</button>
+    <button class="btn quit-btn" (click)="openQuitModal()">Quitter</button>
   </div>
+
+  <div class="modal" *ngIf="showQuitModal">
+    <div class="modal-content">
+      <h2>Choisissez une Stratégie</h2>
+      <p>Sélectionnez une stratégie pour continuer automatiquement :</p>
+      <select [(ngModel)]="selectedStrategy" class="strategy-dropdown">
+        <option *ngFor="let strategy of strategies" [value]="strategy">
+          {{ strategy }}
+        </option>
+      </select>
+      <div class="modal-actions">
+        <button class="btn" (click)="confirmQuit()">Confirmer</button>
+        <button class="btn" (click)="closeQuitModal()">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="game" class="round-summary">
+    <h3>Résumé des Manches</h3>
+    <table class="round-table">
+      <thead>
+        <tr>
+          <th>Joueur</th>
+          <ng-container *ngFor="let round of game.rounds">
+            <th>Manche {{ game.rounds.indexOf(round) + 1 }}</th>
+          </ng-container>
+          <th>Score Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let player of game.players">
+          <td>{{ player.username }}</td>
+          <ng-container *ngFor="let round of game.rounds">
+            <td>
+              <span *ngIf="round.scores[player.id] !== undefined">
+                {{ round.scores[player.id] }} ({{ round.decisions[player.id] }})
+              </span>
+              <span *ngIf="round.scores[player.id] === undefined">
+                N/A
+              </span>
+            </td>
+          </ng-container>
+          <td>{{ player.score }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="modal" *ngIf="game?.state === 'FINISHED'">
+    <div class="modal-content">
+      <h2>Résumé de la Partie</h2>
+      <table class="round-table">
+        <thead>
+          <tr>
+            <th>Joueur</th>
+            <ng-container *ngFor="let round of game?.rounds">
+              <th>Manche {{ game?.rounds!.indexOf(round) + 1 }}</th>
+            </ng-container>
+            <th>Score Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let player of game?.players">
+            <td>{{ player.username }}</td>
+            <ng-container *ngFor="let round of game?.rounds">
+              <td>
+                <span *ngIf="round.scores[player.id] !== undefined">
+                  {{ round.scores[player.id] }} ({{ round.decisions[player.id] }})
+                </span>
+                <span *ngIf="round.scores[player.id] === undefined">
+                  N/A
+                </span>
+              </td>
+            </ng-container>
+            <td>{{ player.score }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="modal-actions">
+        <button class="btn" (click)="goToHome()">Aller à l'Accueil</button>
+        <button class="btn" (click)="createNewGame()">Créer un Nouveau Jeu</button>
+      </div>
+    </div>
+  </div>
+
+  <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
 </div>

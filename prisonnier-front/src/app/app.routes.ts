@@ -20,7 +20,7 @@ export const routes: Routes = [
         component : CreateGameComponent
     },
     { 
-        path: 'waiting-room/:gameId',
+        path: 'waiting-room',
         component: WaitingRoomComponent
     },
     {

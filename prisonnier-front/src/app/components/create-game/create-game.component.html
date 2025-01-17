@@ -1,38 +1,32 @@
-<div class="form-container">
-  <h2>Créer une Partie</h2>
-  <form (ngSubmit)="onCreateGame()" #gameForm="ngForm">
-    <div class="form-group">
-      <label for="playerName">Nom du Joueur</label>
-      <input
-        type="text"
-        id="playerName"
-        name="playerName"
-        [(ngModel)]="playerName"
-        required
-        placeholder="Entrez votre nom"
-        #playerNameInput="ngModel"
-      />
-      <small *ngIf="playerNameInput.invalid && playerNameInput.touched">Nom obligatoire</small>
-    </div>
+<div class="container">
+  <h1>Créer et Rejoindre une Partie</h1>
 
-    <div class="form-group">
-      <label for="rounds">Nombre de Tours</label>
-      <input
-        type="number"
-        id="rounds"
-        name="rounds"
-        [(ngModel)]="rounds"
-        required
-        min="1"
-        placeholder="Entrez le nombre de tours"
-        #roundsInput="ngModel"
-      />
-      <small *ngIf="roundsInput.invalid && roundsInput.touched">Nombre de tours obligatoire</small>
-    </div>
+  <div class="card">
+    <h2>Créer une Partie</h2>
+    <label for="rounds">Nombre Total de Manches :</label>
+    <input
+      id="rounds"
+      type="number"
+      [(ngModel)]="totalRounds"
+      min="1"
+      class="input-field"
+    />
+    <button class="btn" (click)="createGame()">Créer la Partie</button>
+    <p *ngIf="isGameCreated" class="success-message">
+      Partie créée avec succès ! ID de la Partie : <strong>{{ gameId }}</strong>
+    </p>
+  </div>
 
-    <div class="button-group">
-      <button type="submit" [disabled]="!gameForm.valid">Créer</button>
-      <button type="button" (click)="onQuit()">Quitter</button>
-    </div>
-  </form>
+  <div *ngIf="isGameCreated" class="card">
+    <h2>Rejoindre la Partie</h2>
+    <label for="playerName">Nom du Joueur :</label>
+    <input
+      id="playerName"
+      type="text"
+      [(ngModel)]="playerName"
+      class="input-field"
+    />
+    <button class="btn" (click)="joinGame()">Rejoindre la Partie</button>
+  </div>
+  <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
 </div>

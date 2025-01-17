@@ -1,73 +1,99 @@
-.waiting-room-container {
+.container {
   max-width: 600px;
-  margin: 50px auto;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: Arial, sans-serif;
   text-align: center;
-  padding: 20px;
-  background: linear-gradient(to bottom, #f9f9f9, #e9e9e9);
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.game-info p {
-  margin: 10px 0;
-  font-size: 1.2rem;
+h1 {
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.card {
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.card h2 {
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.game-id {
+  color: #007bff;
   font-weight: bold;
 }
 
-.player-list {
-  margin-top: 20px;
-}
-
-.player-card {
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 10px;
-  margin: 10px 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.loader {
-  margin-top: 20px;
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
 }
 
 .spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid #ccc;
-  border-top: 5px solid #007bff;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #007bff;
   border-radius: 50%;
+  width: 40px;
+  height: 40px;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
   to {
     transform: rotate(360deg);
   }
 }
 
-.actions button {
-  margin: 10px;
-  padding: 10px 20px;
+.waiting-text {
+  margin-top: 1rem;
   font-size: 1rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  color: #555;
 }
 
-.actions button:first-child {
-  background-color: #007bff;
-  color: white;
+.success-message {
+  color: green;
+  font-size: 1rem;
+  margin-top: 1rem;
 }
 
-.actions button:last-child {
-  background-color: #dc3545;
-  color: white;
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.actions button:hover {
-  opacity: 0.8;
+.modal {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.modal h2 {
+  color: #333;
+}
+
+.modal p {
+  font-size: 1.25rem;
+  margin-top: 1rem;
+}
+
+.countdown {
+  font-size: 1.5rem;
+  color: #007bff;
+  font-weight: bold;
 }

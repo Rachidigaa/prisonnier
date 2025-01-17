@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameService } from '../../services/game.service';
 import { CommonModule } from '@angular/common';
@@ -8,69 +8,59 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './waiting-room.component.html',
-  styleUrl: './waiting-room.component.css'
+  styleUrls: ['./waiting-room.component.css'],
 })
-export class WaitingRoomComponent {
-  gameId!: number;
-  playerId !: String;
-  gameStatus: any;
-  private intervalId: any; // Stocke la référence de setInterval
+export class WaitingRoomComponent implements OnInit {
+  gameId: number | null = null;
+  playerId: number | null = null;
+  isSecondPlayerJoined: boolean = false;
 
-  constructor(
-    private route: ActivatedRoute,
-    private gameService: GameService,
-    private router: Router
-  ) {}
+  showModal: boolean = false;
+  countdown: number = 3;
 
-  ngOnInit(): void {
-    this.gameId = Number(this.route.snapshot.paramMap.get('gameId'));
-    this.playerId = this.route.snapshot.queryParamMap.get('playerId') || '';
-    this.checkGameStatus();
-    this.pollGameStatus(); // Démarre les vérifications périodiques
-  }
+  constructor(private gameService: GameService, private router: Router, private route: ActivatedRoute) {}
 
-  // Vérifie l'état actuel de la partie
-  checkGameStatus(): void {
-    this.gameService.getGameStatus(this.gameId).subscribe((status) => {
-      this.gameStatus = status;
-      if (status.status === 'STARTED') {
-        this.stopPolling();
-        this.router.navigate([`/game/${this.gameId}/${this.playerId}`]);
+  ngOnInit() {
+    this.route.queryParams.subscribe((params) => {
+      this.gameId = params['gameId'] ? +params['gameId'] : null;
+      this.playerId = params['playerId'] ? +params['playerId'] : null;
+      if (this.gameId && this.playerId) {
+        this.checkForSecondPlayer();
       }
     });
   }
 
-  // Vérifie l'état toutes les 3 secondes
-  pollGameStatus(): void {
-    this.intervalId = setInterval(() => {
-      this.checkGameStatus();
-    }, 3000);
+  checkForSecondPlayer() {
+    const interval = setInterval(() => {
+      if (this.gameId && this.playerId) {
+        this.gameService.getGameStatus(this.gameId,this.playerId).subscribe(
+          (game) => {
+            if (game.players.length === 2) {
+              this.isSecondPlayerJoined = true;
+              clearInterval(interval);
+              this.startCountdown();
+            }
+          },
+          (error) => {
+            console.error('Failed to fetch game status', error);
+          }
+        );
+      }
+    }, 2000);
   }
 
-  // Arrête le polling
-  stopPolling(): void {
-    if (this.intervalId) {
-      clearInterval(this.intervalId); // Arrête setInterval
-      this.intervalId = null;
-    }
+  startCountdown() {
+    this.showModal = true;
+    const countdownInterval = setInterval(() => {
+      this.countdown--;
+      if (this.countdown === 0) {
+        clearInterval(countdownInterval);
+        this.redirectToGame();
+      }
+    }, 1000);
   }
 
-  // Nettoyage lorsque le composant est détruit
-  ngOnDestroy(): void {
-    this.stopPolling(); // Nettoie le setInterval lorsqu'on quitte le composant
+  redirectToGame() {
+    this.router.navigate(['/game', this.gameId, this.playerId]);
   }
-
-  // Quitter la partie
-  quitGame(): void {
-    alert('Vous avez quitté la partie.');
-    this.stopPolling(); // Arrête le polling avant de quitter
-    this.router.navigate(['/home']);
-  }
-
-  // Démarrer la partie (si nécessaire)
-  startGame(): void {
-    this.stopPolling(); // Arrête le polling avant de rediriger
-    this.router.navigate(['/game', this.gameId]); // Redirige vers la page de jeu
-  }
-
 }

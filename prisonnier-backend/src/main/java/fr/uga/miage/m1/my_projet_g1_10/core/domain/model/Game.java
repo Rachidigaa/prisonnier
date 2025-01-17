@@ -1,7 +1,9 @@
-package fr.uga.miage.m1.my_projet_g1_10.core.domain.model;
+package com.example.demo.core.domain.model;
 
-
+import com.example.demo.core.domain.enums.GameState;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,43 +14,94 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String status = "WAITING"; // WAITING, STARTED, FINISHED
-    private int rounds; // Nombre de tours total
-    private int currentRound = 0; // Tours joués
+    private int totalRounds;
 
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
+    private int currentRound = 0;
+
+    @Enumerated(EnumType.STRING)
+    private GameState state;
+
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @OrderBy("id ASC") // Ensures rounds are ordered by their ID
+    private List<Round> rounds = new ArrayList<>();
+
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Player> players = new ArrayList<>();
 
-    // Getters et Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public List<Player> getPlayers() { return players; }
-
-    public void addPlayer(Player player){
-        this.players.add(player);
-    }
-    public void setPlayers(List<Player> players) { this.players = players; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-
-    public int getRounds() { return rounds; }
-    public void setRounds(int rounds) { this.rounds = rounds; }
-
-    public int getCurrentRound() { return currentRound; }
-    public void setCurrentRound(int currentRound) { this.currentRound = currentRound; }
-
-    public boolean isFull() { return players.size() == 2; }
-
-    public boolean isFinished() {
-        return currentRound >= rounds;
+    // Default constructor
+    public Game() {
     }
 
-    public void incrementRound() {
-        this.currentRound++;
-        if (this.currentRound >= this.rounds) {
-            this.status = "FINISHED";
-        }
+    // Getters and setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public int getCurrentRound() {
+        return currentRound;
+    }
+    public void setCurrentRound(int value) {
+        this.currentRound=value;
+    }
+    public int getTotalRounds() {
+        return totalRounds;
+    }
+
+    public void setTotalRounds(int totalRounds) {
+        this.totalRounds = totalRounds;
+    }
+
+    public GameState getState() {
+        return state;
+    }
+
+    public void setState(GameState state) {
+        this.state = state;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<Player> players) {
+        this.players = players;
+    }
+
+    public List<Round> getRounds() {
+        return rounds;
+    }
+
+    public void setRounds(List<Round> rounds) {
+        this.rounds = rounds;
+    }
+
+    // Utility methods
+    public void addPlayer(Player player) {
+        players.add(player);
+        player.setGame(this);
+    }
+
+    public void removePlayer(Player player) {
+        players.remove(player);
+        player.setGame(null);
+    }
+
+    public void addRound(Round round) {
+        rounds.add(round);
+        round.setGame(this);
+    }
+    public void incrementCurrentRound()
+    {
+        currentRound++;
+    }
+    public void removeRound(Round round) {
+        rounds.remove(round);
+        round.setGame(null);
     }
 }

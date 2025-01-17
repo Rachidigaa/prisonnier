@@ -1,8 +1,8 @@
-package fr.uga.miage.m1.my_projet_g1_10.core.domain.strategiescreators;
+package com.example.demo.core.domain.strategiesCreators;
 
-import fr.uga.miage.m1.my_projet_g1_10.core.domain.enums.Strategie;
-import fr.uga.miage.m1.my_projet_g1_10.core.domain.strategies.*;
 
+import com.example.demo.core.domain.enums.Strategie;
+import com.example.demo.core.domain.strategies.*;
 
 public class StrategieFactory {
 
